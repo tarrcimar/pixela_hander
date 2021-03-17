@@ -6,7 +6,7 @@ import webbrowser
 
 webbrowser.open('https://pixe.la/v1/users/kevelin/graphs/dactivity.html')
 
-USERNAME = "kevelin"
+USERNAME = "tmarton"
 TOKEN = "saf9sf8sf4n8asdh"
 GRAPHID = "dactivity"
 
@@ -35,6 +35,10 @@ class Create(Tk):
         super().__init__()
         self.config(padx = 20, pady = 20, bg=BG)
         self.title("Pixela Poster")
+
+        canvas = Canvas(width = 200, height = 224, bg = BG, highlightthickness = 0)
+        logo_png = PhotoImage(file = "logo.png")
+        canvas.create_image(100,112,image = logo_png)
 
         self.date_input = Entry(width = 30, justify = CENTER)
         self.date_input.grid(column = 1, row = 1)
