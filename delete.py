@@ -1,11 +1,23 @@
 import requests
 
-ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users'
+ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users/'
 headers = {
-    "X-USER-TOKEN":"12381jdj12jdj"
+    "X-USER-TOKEN":"skljfva8a4wrm283"
 }
 
-graph_endpoint = f"{ORIGINAL_ENDPOINT}/fosika"
+graph_endpoint = f"{ORIGINAL_ENDPOINT}/tmarton/graphs"
+    
+create_params = {
+    "id":"fos1",
+    "name":"Fostoló",
+    "unit":"fos",
+    "type":"int",
+    "color":"shibafu"
+}
 
-response = requests.delete(url=graph_endpoint, headers=headers)
+print(create_params)
+
+response = requests.post(url=graph_endpoint, json=create_params, headers=headers)
 print(response.text)
+with open("user.txt", "a") as file:
+    file.write(",fos1")

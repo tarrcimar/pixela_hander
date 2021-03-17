@@ -29,7 +29,7 @@ color = ""
 OPTIONS = ['Update','New', 'Delete']
 
 headers = {
-    "X-USER-TOKEN":TOKEN
+    "X-USER-TOKEN":"skljfva8a4wrm283"
 }
 
 
@@ -46,11 +46,11 @@ FAILURE = "#e85423"
 
 def get_logo_color():
     graph_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs"
-
+    print(USERNAME, TOKEN)
     response = requests.get(url=graph_endpoint, headers=headers)
     response = response.json()
-    print(response)
     color = COLORS[response["graphs"][0]["color"]]
+
     return color
 
 def submit():
@@ -100,13 +100,12 @@ def new_user(username, token):
     with open("user.txt", "x") as file:
         file.write(f"{USERNAME},{TOKEN}")
 
-#new_user()
 
 ## CREATE GRAPH
 def create(graph_id, graph_name, graph_unit, graph_type, graph_color):
     graph_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs"
-
-    graph_config = {
+    
+    create_params = {
         "id":graph_id,
         "name":graph_name,
         "unit":graph_unit,
@@ -114,14 +113,16 @@ def create(graph_id, graph_name, graph_unit, graph_type, graph_color):
         "color":graph_color
     }
 
-    response = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
-    print(response.text)
+    print(create_params)
+
+    response = requests.post(url=graph_endpoint, json=create_params, headers=headers)
     with open("user.txt", "a") as file:
         file.write(f",{graph_id}")
 
 retek = []
 
 def read_user():
+    global retek
     global USERNAME
     global TOKEN
     global GRAPHID
@@ -202,29 +203,30 @@ if(LENGTH>1):
 
         answer = input("Do you want to create a graph? Y/N: ")
         if(answer == 'Y'):
-            pass
-            #create()
-        elif(answer == 'N'):
-            pass
+            create()
     elif(ARGS[1] == "create"):
         print("Please specify your new graph.") #Name of the graph: Unit of graph: Type of graph: Color of pixels:
         graph_id = input("ID of the graph: ")
-        name = input("Graph Name:")
-        unit = input("Unit of graph: ")
-        type = input("Type of graph (int/float): ")
+        graph_name = input("Graph Name:")
+        graph_unit = input("Unit of graph: ")
+        graph_type = input("Type of graph (int/float): ")
         print("Available colors: shibafu (green), momiji (red), sora (blue), ichou (yellow), ajisai (purple) and kuro (black)")
-        pixel_color = input("Color of pixels: ")
-        create(graph_id, name, unit, type, pixel_color)
-
+        graph_color = input("Color of pixels: ")
+        print(USERNAME)
+        create(graph_id, graph_name, graph_unit, graph_type, graph_color)
 else:
     read_user()
-    print(USERNAME, TOKEN, GRAPHID)
+    headers["X-USER-TOKEN"] = TOKEN
+
+    print(f"Available graphs: {retek[2:]}")
+    graph = input("Which graph?")
+    GRAPHID = graph
+
     openstring = f'{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}.html'
-    #webbrowser.open(openstring)
+    webbrowser.open(openstring)
 
     color = get_logo_color()
     png_path = f".//images//{color}.png"
-    print(png_path)
 
     window = Tk()
     window.config(padx = 20, pady = 20, bg=BG)
