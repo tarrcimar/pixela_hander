@@ -4,11 +4,15 @@ import sys
 from tkinter import *
 import webbrowser
 
-webbrowser.open('https://pixe.la/v1/users/kevelin/graphs/dactivity.html')
 
-USERNAME = "kevelin"
-TOKEN = "saf9sf8sf4n8asdh"
-GRAPHID = "dactivity"
+USERNAME = "tmarton"
+TOKEN = "skljfva8a4wrm283"
+GRAPHID = "graph1"
+
+ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users'
+
+openstring = f'{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}.html'
+webbrowser.open(openstring)
 
 headers = {
     "X-USER-TOKEN":TOKEN
@@ -23,51 +27,42 @@ FAILURE = "#e85423"
 date = datetime.datetime.now()
 TODAY = date.strftime(r"%Y%m%d")
 
-ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users'
-
 FONT = ("Corbel", 12, "bold")
 
 OPTIONS = ['Update','New']
 
 
-class Create(Tk):
-    def __init__(self):
-        super().__init__()
-        self.config(padx = 20, pady = 20, bg=BG)
-        self.title("Pixela Poster")
+def submit():
+    button.config(bg=BG_ALT)
+    if(list.get() == "New"):
+        add()
+    elif(list.get() == "Update"):
+        update()
 
-        self.date_input = Entry(width = 30, justify = CENTER)
-        self.date_input.grid(column = 1, row = 1)
+window = Tk()
+window.config(padx = 20, pady = 20, bg=BG)
+window.title("Pixela Poster")
 
-        self.date_label = Label(text = "Date (YYYYMMDD)", bg=BG, fg=FG, font=FONT)
-        self.date_label.grid(column = 1, row = 0, pady = 10)
+date_input = Entry(width = 30, justify = CENTER)
+date_input.grid(column = 1, row = 1)
 
-        self.counter_input = Entry(width = 30, justify=CENTER)
-        self.counter_input.grid(column = 1, row = 3)
+date_label = Label(text = "Date (YYYYMMDD)", bg=BG, fg=FG, font=FONT)
+date_label.grid(column = 1, row = 0, pady = 10)
+counter_input = Entry(width = 30, justify=CENTER)
+counter_input.grid(column = 1, row = 3)
+counter_label = Label(text = "Value", bg=BG, fg=FG, font=FONT)
+counter_label.grid(column = 1, row = 2, pady = 10)
 
-        self.counter_label = Label(text = "Value", bg=BG, fg=FG, font=FONT)
-        self.counter_label.grid(column = 1, row = 2, pady = 10)
+list = StringVar()
+list.set("Choose action")
+menu = OptionMenu(window, list, *OPTIONS)
+menu.grid(column = 1, row = 4, pady = 10)
+menu.config(bg=BG_ALT, fg = FG)
+menu["menu"].config(bg=BG_ALT, fg=FG, borderwidth=0)
+menu["highlightthickness"] = 0
 
-        self.list = StringVar()
-        self.list.set("Choose action")
-        self.menu = OptionMenu(self, self.list, *OPTIONS)
-        self.menu.grid(column = 1, row = 4, pady = 10)
-        self.menu.config(bg=BG_ALT, fg = FG)
-        self.menu["menu"].config(bg=BG_ALT, fg=FG, borderwidth=0)
-        self.menu["highlightthickness"] = 0
-
-        self.button = Button(text="Submit", command = self.submit, bg=BG_ALT, fg=FG, font=FONT)
-        self.button.grid(column = 1, row = 5, pady = 10)
-
-    def submit(self):
-        self.button.config(bg=BG_ALT)
-        if(self.list.get() == "New"):
-            add()
-        elif(self.list.get() == "Update"):
-            update()
-
-
-gui = Create()
+button = Button(text="Submit", command = submit, bg=BG_ALT, fg=FG, font=FONT)
+button.grid(column = 1, row = 5, pady = 10)
 
 #NEW USER
 def new_user():
@@ -107,22 +102,22 @@ commit_time = ""
 def add():
     pixeladd_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}"
 
-    if(len(gui.date_input.get()) >= 1):
-        commit_time = gui.date_input.get()
+    if(len(date_input.get()) >= 1):
+        commit_time = date_input.get()
     else:
         commit_time = TODAY
 
     pixel_config = {
         "date":commit_time,
-        "quantity":f"{gui.counter_input.get()}"
+        "quantity":f"{counter_input.get()}"
     }
 
     response = requests.post(url=pixeladd_endpoint, json=pixel_config, headers=headers)
     code = response.status_code
     if(code == 200):
-        gui.button.config(bg=SUCCESS)
+        button.config(bg=SUCCESS)
     else:
-        gui.button.config(bg=FAILURE)
+        button.config(bg=FAILURE)
 
 pixeladd_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}"
 pixel_config = {
@@ -135,8 +130,8 @@ print(response.text)
 
 ##UPDATE A PIXEL
 def update():
-    if(len(gui.date_input.get()) >= 1):
-        commit_time = gui.date_input.get()
+    if(len(date_input.get()) >= 1):
+        commit_time = date_input.get()
     else:
         commit_time = TODAY
     
@@ -145,15 +140,15 @@ def update():
     update_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}/{commit_time}"
 
     update_config = {
-        "quantity":f"{gui.counter_input.get()}"
+        "quantity":f"{counter_input.get()}"
     }
 
     response = requests.put(url=update_endpoint, json=update_config, headers=headers)
     code = response.status_code
     if(code == 200):
-        gui.button.config(bg=SUCCESS)
+        button.config(bg=SUCCESS)
     else:
-        gui.button.config(bg=FAILURE)
+        button.config(bg=FAILURE)
     print(response.text)
 
-gui.mainloop()
+window.mainloop()
