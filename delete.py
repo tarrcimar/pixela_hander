@@ -2,22 +2,27 @@ import requests
 
 ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users/'
 headers = {
-    "X-USER-TOKEN":"skljfva8a4wrm283"
+    "X-USER-TOKEN":"fosi1234"
 }
 
-graph_endpoint = f"{ORIGINAL_ENDPOINT}/tmarton/graphs"
+graph_endpoint = f"{ORIGINAL_ENDPOINT}/fosika"
     
-create_params = {
-    "id":"fos1",
-    "name":"Fostoló",
-    "unit":"fos",
-    "type":"int",
-    "color":"shibafu"
-}
 
-print(create_params)
 
-response = requests.post(url=graph_endpoint, json=create_params, headers=headers)
+response = requests.delete(url=graph_endpoint, headers=headers)
 print(response.text)
-with open("user.txt", "a") as file:
-    file.write(",fos1")
+print(response.status_code)
+
+"""def create():
+    graph_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs"
+
+    graph_config = {
+        "id":GRAPHID,
+        "name":"Daily Activity Level",
+        "unit":"commit",
+        "type":"int",
+        "color":"ichou"
+    }
+
+    response = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
+    print(response.text)"""
