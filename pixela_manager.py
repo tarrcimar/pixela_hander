@@ -4,23 +4,27 @@ import sys
 from tkinter import *
 from PIL import ImageTk, Image
 import webbrowser
+import time
 
 USERNAME = "tmarton"
 TOKEN = "skljfva8a4wrm283"
 GRAPHID = "graph1"
 
+ARGS = sys.argv
+LENGTH = len(ARGS)
+
 ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users'
 
 openstring = f'{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}.html'
-#webbrowser.open(openstring)
+webbrowser.open(openstring)
 
 headers = {
     "X-USER-TOKEN":TOKEN
 }
 
-BG = "#a67068"
-FG = "#f5f5dc"
-BG_ALT = "#a05a4e"
+BG = "#ffffff"
+FG = "#000000"
+BG_ALT = "#276722"
 SUCCESS = "#42f557"
 FAILURE = "#e85423"
 
@@ -29,50 +33,42 @@ TODAY = date.strftime(r"%Y%m%d")
 
 FONT = ("Corbel", 12, "bold")
 
-OPTIONS = ['Update','New']
+OPTIONS = ['Update','New', 'Delete']
 
 
 def submit():
-    button.config(bg=BG_ALT)
     if(list.get() == "New"):
         add()
     elif(list.get() == "Update"):
         update()
+    elif(list.get() == "Delete"):
+        delete()
 
-window = Tk()
-window.config(padx = 20, pady = 20, bg=BG)
-window.title("Pixela Poster")
+def increment():
+    graph_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}/increment"
 
-image = Image.open('logo.png')
-# The (450, 350) is (height, width)
-image = image.resize((450, 350), Image.ANTIALIAS)
-my_img = ImageTk.PhotoImage(image)
-my_img = Label(image = my_img)
-my_img.grid(column=1, row=1)
+    response = requests.put(url=graph_endpoint, headers=headers)
+    if(response.status_code != 200):
+        status_label.config(state=NORMAL, text="Increment failed")
+    else:
+        status_label.config(state=NORMAL, text="Pixel incremented")
+    window.after(1500, func=resetlabel)
+    print(response.text)
 
-date_label = Label(text = "Date (YYYYMMDD)", bg=BG, fg=FG, font=FONT)
-date_label.grid(column = 1, row = 1, pady = 10)
+def decrement():
+    graph_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}/decrement"
 
-date_input = Entry(width = 30, justify = CENTER)
-date_input.grid(column = 1, row = 2)
+    response = requests.put(url=graph_endpoint, headers=headers)
+    if(response.status_code != 200):
+        status_label.config(state=NORMAL, text="Decrement failed")
+    else:
+        status_label.config(state=NORMAL, text="Pixel decremented")
+    window.after(1500, func=resetlabel)
+    print(response.text)
 
-counter_label = Label(text = "Value", bg=BG, fg=FG, font=FONT)
-counter_label.grid(column = 1, row = 3, pady = 10)
-
-counter_input = Entry(width = 30, justify=CENTER)
-counter_input.grid(column = 1, row = 4)
-
-
-list = StringVar()
-list.set("Choose action")
-menu = OptionMenu(window, list, *OPTIONS)
-menu.grid(column = 1, row = 5, pady = 10)
-menu.config(bg=BG_ALT, fg = FG)
-menu["menu"].config(bg=BG_ALT, fg=FG, borderwidth=0)
-menu["highlightthickness"] = 0
-
-button = Button(text="Submit", command = submit, bg=BG_ALT, fg=FG, font=FONT)
-button.grid(column = 1, row = 6, pady = 10)
+def resetlabel():
+    status_label.config(state=DISABLED)
+    
 #NEW USER
 def new_user():
     user_params = {
@@ -104,7 +100,7 @@ def create():
     
 #create()
 
-commit_time = ""
+commit_time = TODAY
 
 
 ##ADD PIXEL
@@ -122,18 +118,12 @@ def add():
     }
 
     response = requests.post(url=pixeladd_endpoint, json=pixel_config, headers=headers)
-    code = response.status_code
-    if(code == 200):
-        button.config(bg=SUCCESS)
+    if(response.status_code != 200):
+        status_label.config(state=NORMAL, text="Adding failed")
     else:
-        button.config(bg=FAILURE)
-
-pixeladd_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}"
-pixel_config = {
-        "unit":"units"
-    }
-response = requests.put(url=pixeladd_endpoint, json=pixel_config, headers=headers)
-print(response.text)
+        status_label.config(state=NORMAL, text="Pixel added")
+    print(response.text)
+    window.after(1500, func=resetlabel)
 
 
 
@@ -153,11 +143,66 @@ def update():
     }
 
     response = requests.put(url=update_endpoint, json=update_config, headers=headers)
-    code = response.status_code
-    if(code == 200):
-        button.config(bg=SUCCESS)
+    if(response.status_code != 200):
+        status_label.config(state=NORMAL, text="Update unsuccessful")
     else:
-        button.config(bg=FAILURE)
+        status_label.config(state=NORMAL, text="Update successful")
+    window.after(1500, func=resetlabel)
     print(response.text)
+
+#DELETE PIXEL
+def delete():
+    graph_endpoint = f"{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}/{commit_time}"
+
+    response = requests.delete(url=graph_endpoint, headers=headers)
+    if(response.status_code != 200):
+        status_label.config(state=NORMAL, text="Delete unsuccessful")
+    else:
+        status_label.config(state=NORMAL, text="Pixel deleted")
+    window.after(1500, func=resetlabel)
+    print(response.text)
+
+window = Tk()
+window.config(padx = 20, pady = 20, bg=BG)
+window.title("Pixela Poster")
+
+logo = Image.open(r'./images/PIXELA_GREEN.png')
+logo = ImageTk.PhotoImage(logo)
+logolabel = Label(image=logo, height=100, width = 300, bg=BG)
+logolabel.image = logo
+logolabel.grid(column=1, row = 0)
+
+date_label = Label(text = "Date (YYYYMMDD)", bg=BG, fg=FG, font=FONT)
+date_label.grid(column = 1, row = 1, pady = 10)
+
+date_input = Entry(width = 30, justify = CENTER)
+date_input.grid(column = 1, row = 2)
+
+counter_label = Label(text = "Value", bg=BG, fg=FG, font=FONT)
+counter_label.grid(column = 1, row = 3, pady = 10)
+
+counter_input = Entry(width = 30, justify=CENTER)
+counter_input.grid(column = 1, row = 4)
+
+
+list = StringVar()
+list.set("Choose action")
+menu = OptionMenu(window, list, *OPTIONS)
+menu.grid(column = 1, row = 5, pady = 10)
+menu.config( fg = FG)
+menu["menu"].config(fg=FG, borderwidth=0)
+menu["highlightthickness"] = 0
+
+button = Button(text="Submit", command = submit, fg=FG, font=FONT)
+button.grid(column = 1, row = 6, pady = 10)
+
+increment_button = Button(text="+", command=increment, fg=FG, font=FONT)
+increment_button.grid(column=1, row = 5, pady = 10, ipadx=5, sticky = "w", padx = 30)
+decrement_button = Button(text="-", command=decrement, fg=FG, font=FONT)
+decrement_button.grid(column=1, row=5, pady=10, ipadx=5,sticky="e", padx = 30)
+
+status_label = Label(text="Something", bg=BG, fg=FG, font=FONT, disabledforeground=BG, state=DISABLED)
+status_label.grid(column=1, row = 7)
+
 
 window.mainloop()
