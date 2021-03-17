@@ -4,11 +4,14 @@ import sys
 from tkinter import *
 import webbrowser
 
-webbrowser.open('https://pixe.la/v1/users/kevelin/graphs/dactivity.html')
-
 USERNAME = "tmarton"
-TOKEN = "saf9sf8sf4n8asdh"
-GRAPHID = "dactivity"
+TOKEN = "skljfva8a4wrm283"
+GRAPHID = "graph1"
+
+ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users'
+
+openstring = f'{ORIGINAL_ENDPOINT}/{USERNAME}/graphs/{GRAPHID}.html'
+webbrowser.open(openstring)
 
 headers = {
     "X-USER-TOKEN":TOKEN
@@ -22,8 +25,6 @@ FAILURE = "#e85423"
 
 date = datetime.datetime.now()
 TODAY = date.strftime(r"%Y%m%d")
-
-ORIGINAL_ENDPOINT = 'https://pixe.la/v1/users'
 
 FONT = ("Corbel", 12, "bold")
 
