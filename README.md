@@ -2,14 +2,14 @@
 
 This is a tool for easily managing the pixe.la API with a GUI and Command Line Arguments
 
-##How to run
+## How to run
 
 Just run the main.py in the command line:
 ```
 python main.py
 ```
 
-##Usage
+## Usage
 
 The usage of this tool can be separated into two parts:
 
